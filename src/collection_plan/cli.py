@@ -14,8 +14,10 @@ import pandas as pd
 
 from .config import load_config
 from .pipeline import run_plan
+from .report_excel import write_excel
+from .report_html import write_html
 from .synthetic import generate_history
-from .workforce import size_workforce
+from .workforce import calendar_table, size_workforce
 
 log = logging.getLogger("collection_plan")
 
@@ -38,10 +40,15 @@ def cmd_run(args: argparse.Namespace) -> None:
     result.monthly.to_csv(out / "plan_monthly.csv", index=False)
     summary = result.summary()
     summary.to_csv(out / "plan_summary.csv")
+    workforce, calendars = None, None
     if cfg.workforce:
-        by_group, by_region = size_workforce(result.monthly, cfg.workforce, cfg.plan_year)
-        by_group.to_csv(out / "workforce_by_group.csv", index=False)
-        by_region.to_csv(out / "workforce_by_region.csv", index=False)
+        workforce = size_workforce(result.monthly, cfg.workforce, cfg.plan_year)
+        calendars = calendar_table(cfg.plan_year, cfg.workforce)
+        workforce[0].to_csv(out / "workforce_by_group.csv", index=False)
+        workforce[1].to_csv(out / "workforce_by_region.csv", index=False)
+    if not args.no_reports:
+        write_excel(result, out / "plan_report.xlsx", workforce)
+        write_html(result, out / "plan_report.html", workforce, calendars)
 
     view = pd.DataFrame(
         {
@@ -75,6 +82,7 @@ def main(argv: list[str] | None = None) -> None:
     r.add_argument("--config", default="config/assumptions.yaml")
     r.add_argument("--data", default="data/raw/history.csv")
     r.add_argument("--out", default="outputs")
+    r.add_argument("--no-reports", action="store_true", help="skip the Excel and HTML reports (CSV only)")
     r.set_defaults(func=cmd_run)
 
     args = p.parse_args(argv)
