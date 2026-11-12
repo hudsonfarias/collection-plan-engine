@@ -1,0 +1,118 @@
+# Assumptions for the plan year. Every number the engine uses that is not data lives here.
+# All data is fictional: a made-up utility ("Acme Power") with five regions.
+
+plan_year: 2027
+history_year: 2026
+last_actual_month: 10          # forecast = actuals Jan..Oct + targets Nov..Dec
+
+allocation:
+  gap_weight: 0.25             # regions below the history-year target get share x (1 + 0.25 x gap)
+
+limits:
+  min_gain: 0.005              # allowed range for productivity/efficiency gains (percentage points)
+  max_gain: 0.02
+  productivity_cap: 1.0
+  efficiency_cap: 1.0
+
+ticket:
+  min_quarter_qty: 30          # quarters with fewer executions are left out of the ticket average
+
+rules:
+  productivity_floor: true     # consolidated productivity of a tool cannot fall below its forecast
+  prioritize_large_debts: true # value productivity >= qty productivity (selected ticket <= executed ticket)
+
+# Market growth applied to the ticket, month by month (Jan..Dec)
+market_growth: [-0.027, 0.021, 0.035, -0.021, 0.009, 0.274, 0.343, 0.502, 0.596, 0.583, 0.506, 0.508]
+
+# Seasonality by tool group (share of the year executed in each month; normalised by the engine)
+seasonality:
+  disconnection: [0.0712, 0.0636, 0.0928, 0.0758, 0.0804, 0.0882, 0.0997, 0.0950, 0.0843, 0.0812, 0.0797, 0.0882]
+  soft: [0.080, 0.068, 0.088, 0.084, 0.080, 0.088, 0.088, 0.088, 0.084, 0.080, 0.080, 0.092]
+
+tools:
+  - name: field_disconnection
+    group: disconnection
+    volume: 46770
+    gains: {prod_qty: 0.01, prod_value: 0.01, eff_qty: 0.01, eff_value: 0.01}
+
+  - name: re_disconnection
+    group: disconnection
+    volume: 9786
+    gains: {prod_qty: 0.01, prod_value: 0.01, eff_qty: 0.01, eff_value: 0.005}
+    efficiency_overrides:          # contracted value efficiency for one region
+      Capital: {eff_value: 0.062}
+
+  - name: special_notice
+    group: soft
+    volume: 107001
+    gains: {prod_qty: 0.01, prod_value: 0.01, eff_qty: 0.01, eff_value: 0.01}
+
+  - name: remote_disconnection
+    group: soft
+    volume: 28324
+    ticket_target: 760             # scale volume reaches smaller debts
+    gains: {prod_qty: 0.01, prod_value: 0.01, eff_qty: 0.01, eff_value: 0.01}
+
+  - name: field_visit
+    group: soft
+    volume: 82423
+    ticket_target: 1500
+    gains: {prod_qty: 0.01, prod_value: 0.01, eff_qty: 0.01, eff_value: 0.01}
+
+  # New tools: no history of their own, they borrow it from a reference tool
+  - name: symbolic_disconnection
+    group: soft
+    volume: 19670
+    reference: remote_disconnection    # ticket, productivity and efficiency
+    allocation_from: field_visit       # regional split
+    excluded_regions: [Capital]        # agreed not to compete with remote_disconnection there
+    efficiency_reducer: 0.36           # efficiency = reference x (1 - 36%)
+    gains: {prod_qty: 0.01, prod_value: 0.01}
+
+  - name: digital_notice
+    group: soft
+    volume: 25341
+    reference: special_notice
+    fixed_efficiency: {eff_qty: 0.38, eff_value: 0.38}   # digital channel is less effective than field
+    gains: {prod_qty: 0.01, prod_value: 0.01}
+
+workforce:
+  calendars:
+    standard:                      # Mon-Fri + half-day Saturday
+      weekdays: [0, 1, 2, 3, 4]
+      saturday_weight: 0.5
+      exclude_holiday_eves: false
+    restricted:                    # Mon-Thu only, no holidays and no holiday eves
+      weekdays: [0, 1, 2, 3]
+      saturday_weight: 0.0
+      exclude_holiday_eves: true
+  groups:
+    - name: soft_field
+      actions_per_day: 90
+      tools:
+        special_notice: standard
+        field_visit: standard
+        symbolic_disconnection: restricted
+    - name: remote_ops
+      actions_per_day: 36
+      tools:
+        remote_disconnection: restricted
+      extra_volumes:               # work that is not in the plan but uses the same team
+        - name: remote_reconnection
+          annual: 14463
+          calendar: standard
+          shape_from: remote_disconnection
+  holidays:
+    - 2027-01-01
+    - 2027-02-08
+    - 2027-02-09
+    - 2027-03-26
+    - 2027-04-21
+    - 2027-05-01
+    - 2027-05-27
+    - 2027-09-07
+    - 2027-10-12
+    - 2027-11-02
+    - 2027-11-15
+    - 2027-11-20
+    - 2027-12-25
