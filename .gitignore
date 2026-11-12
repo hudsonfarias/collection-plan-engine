@@ -1,0 +1,21 @@
+# data and outputs are generated
+data/raw/
+outputs/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+~$*
