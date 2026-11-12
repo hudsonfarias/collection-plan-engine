@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collection Plan · Report</title>
+<style>
+:root{--navy:#1F4E79;--title:#0B2A5B;--orange:#E28100;--teal:#026584;--card:#F3F5F8;--line:#D9DEE5;--text:#1E2430;--muted:#5B6575;--good:#2E7D4F;--bad:#C0392B;--hl:#FFF4E5}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--text);font:14px/1.45 "Segoe UI",system-ui,Arial,sans-serif}
+header{background:var(--title);color:#fff;padding:18px 28px 14px}
+header h1{margin:0;font-size:22px;font-weight:600}
+header .sub{opacity:.85;font-size:12.5px;margin-top:4px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px 40px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:16px 0 8px;border-bottom:1px solid var(--line)}
+.lbl{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px;color:var(--text)}
+.chip:hover{border-color:var(--navy)}.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+select{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:6px}
+.stepper{display:flex;overflow-x:auto;margin:16px 0 6px;padding-bottom:4px}
+.step{flex:1 0 116px;position:relative;cursor:pointer;padding:9px 11px;background:var(--card);margin-right:14px;border-radius:8px;border:2px solid transparent}
+.step:after{content:"";position:absolute;right:-12px;top:50%;margin-top:-6px;border:6px solid transparent;border-left:8px solid #AAB4C2}
+.step:last-child:after{display:none}
+.step .n{display:inline-block;width:19px;height:19px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;text-align:center;line-height:19px;margin-right:5px}
+.step .t{font-weight:600;font-size:12.5px;color:var(--title)}
+.step .v{font-size:15px;font-weight:700;margin-top:4px;white-space:nowrap}
+.step .d{font-size:11px;color:var(--muted)}
+.step.on{border-color:var(--orange);background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}.step.on .n{background:var(--orange)}
+h2{font-size:20px;color:var(--title);margin:12px 0 2px;font-weight:600}
+.lead{color:var(--muted);margin:0 0 14px}
+.rule{background:#fff;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:6px;padding:10px 14px;margin-bottom:14px}
+.rule b{color:var(--title)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+.card{background:var(--card);border-radius:8px;padding:14px 16px}.card h3{margin:0 0 8px;font-size:13.5px;color:var(--title)}
+.flow{display:flex;flex-wrap:wrap;margin-bottom:14px}
+.fbox{flex:1 1 150px;background:var(--card);border-radius:8px;padding:10px 12px;position:relative;margin-right:22px;min-width:140px;margin-bottom:6px}
+.fbox:after{content:"→";position:absolute;right:-18px;top:50%;transform:translateY(-50%);color:var(--orange);font-weight:700;font-size:18px}
+.fbox:last-child{margin-right:0}.fbox:last-child:after{display:none}
+.k{font-size:11.5px;color:var(--muted)}.x{font-size:19px;font-weight:700;color:var(--title)}.s{font-size:11.5px;color:var(--muted)}
+.fbox.out,.kpi.dark{background:var(--navy)}.fbox.out .k,.fbox.out .s,.kpi.dark .k,.kpi.dark .s{color:#D6E2F0}.fbox.out .x,.kpi.dark .x{color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:8px;padding:10px 12px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;background:#fff}
+th{background:var(--navy);color:#fff;font-weight:600;padding:6px 8px;text-align:right;white-space:nowrap}th:first-child{text-align:left}
+td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}td:first-child{text-align:left}
+tr.tot td{font-weight:700;background:#EAF0F7}tr.sel td{background:var(--hl)}tr.click{cursor:pointer}tr.click:hover td{background:#F4F7FB}
+.pos{color:var(--good)}.neg{color:var(--bad)}.muted{color:var(--muted)}
+.note{font-size:12.5px;background:#fff;border:1px dashed #C9D1DC;border-radius:6px;padding:8px 12px;margin-top:10px}.note b{color:var(--orange)}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:0 0 4px;flex-wrap:wrap}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+footer{color:var(--muted);font-size:12px;margin-top:26px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:900px){.c4,.c5,.c6,.c7,.c8{grid-column:span 12}}
+</style>
+</head>
+<body>
+<header><h1>Collection Plan · how the plan is built</h1><div class="sub" id="sub"></div></header>
+<div class="wrap">
+  <div class="controls">
+    <span class="lbl">Tool</span><div class="chips" id="tools"></div>
+    <span class="lbl">Region</span><select id="region"></select>
+  </div>
+  <div class="stepper" id="stepper"></div>
+  <div id="panel"></div>
+  <footer>Synthetic data. Generated by <b>collection-plan-engine</b>. Forecast = actuals up to the cut-off month + targets for the remaining months.</footer>
+</div>
+<script>
+const D = /*__DATA__*/null;
+const VOLS = ['qty_executed','value_executed','qty_selected','value_selected','qty_paid','value_paid'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const QS = ['Q1','Q2','Q3','Q4'];
+const C = {navy:'#1F4E79',orange:'#E28100',teal:'#026584',gray:'#B4BFCC',light:'#C9D6E6',peach:'#F6C98A'};
+const TN = Object.fromEntries(D.tools.map(t=>[t.name,t]));
+const NAMES = D.tools.map(t=>t.name);
+const st = {tool:'ALL', region:'ALL', step:0};
+
+// ---------- format ----------
+const nf=(d)=>new Intl.NumberFormat('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const N=(v,d=0)=>v==null||isNaN(v)?'—':nf(d).format(v);
+const M=(v,d=1)=>v==null||isNaN(v)?'—':nf(d).format(v/1e6)+' M';
+const P=(v,d=1)=>v==null||isNaN(v)?'—':nf(d).format(v*100)+'%';
+const PP=(v,d=1)=>v==null||isNaN(v)?'—':(v>=0?'+':'−')+nf(d).format(Math.abs(v*100))+' pp';
+const DV=(a,b)=>!b?'—':((a/b-1)>=0?'+':'−')+nf(1).format(Math.abs((a/b-1)*100))+'%';
+const cls=(x)=>x>0?'pos':(x<0?'neg':'');
+const label=(n)=>n.replace(/_/g,' ');
+const short=(n)=>label(n).replace('disconnection','disc.').replace('special ','spec. ');
+
+// ---------- data ----------
+function sumSeries(src, tools, regions, len){
+  const o={}; VOLS.forEach(c=>o[c]=Array(len).fill(0));
+  tools.forEach(t=>regions.forEach(r=>{const s=(src[t]||{})[r]; if(!s) return; VOLS.forEach(c=>s[c].forEach((v,i)=>o[c][i]+=v||0));}));
+  return o;
+}
+const selTools=()=>st.tool==='ALL'?NAMES:[st.tool];
+const selRegions=()=>st.region==='ALL'?D.regions:[st.region];
+const plan=(tools=selTools(),regions=selRegions())=>sumSeries(D.plan,tools,regions,12);
+const fcq=(tools=selTools(),regions=selRegions())=>sumSeries(D.forecast_q,tools,regions,4);
+const tgq=(tools=selTools(),regions=selRegions())=>sumSeries(D.target_q,tools,regions,4);
+const tot=(o)=>{const r={};VOLS.forEach(c=>r[c]=o[c].reduce((a,b)=>a+b,0));return r;};
+function rat(o){const d=(a,b)=>b?a/b:null;return {...o,ticket:d(o.value_executed,o.qty_executed),prod_qty:d(o.qty_executed,o.qty_selected),
+  prod_value:d(o.value_executed,o.value_selected),eff_qty:d(o.qty_paid,o.qty_executed),eff_value:d(o.value_paid,o.value_executed)};}
+const at=(o,i)=>rat(Object.fromEntries(VOLS.map(c=>[c,o[c][i]])));
+const year=(o)=>rat(tot(o));
+
+// ---------- chart ----------
+function chart(o){
+  const W=o.w||760,H=o.h||250,pl=58,pr=o.line?54:12,pt=10,pb=32,cw=W-pl-pr,chh=H-pt-pb,n=o.cats.length,bars=o.bars||[];
+  let mx=0; if(o.stacked){for(let i=0;i<n;i++)mx=Math.max(mx,bars.reduce((a,b)=>a+(b.vals[i]||0),0));} else bars.forEach(b=>b.vals.forEach(v=>{if(v!=null)mx=Math.max(mx,v);}));
+  mx=(mx||1)*1.12; const y=(v)=>pt+chh-(v/mx)*chh;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img">`;
+  for(let g=0;g<=4;g++){const v=mx*g/4,yy=y(v);s+=`<line x1="${pl}" x2="${W-pr}" y1="${yy}" y2="${yy}" stroke="#E4E8EE"/><text x="${pl-6}" y="${yy+4}" font-size="10.5" fill="#7A8494" text-anchor="end">${o.fmt(v)}</text>`;}
+  const gw=cw/n,nb=o.stacked?1:bars.length,bw=Math.min(44,(gw*.72)/nb),lab=n*nb<=40;
+  for(let i=0;i<n;i++){const gx=pl+gw*i+(gw-bw*nb)/2;let acc=0;
+    bars.forEach((b,j)=>{const v=b.vals[i];if(v==null)return;const x=o.stacked?gx:gx+bw*j,y0=o.stacked?y(acc+v):y(v),hh=o.stacked?y(acc)-y(acc+v):y(0)-y(v);
+      s+=`<rect x="${x}" y="${y0}" width="${bw-2}" height="${Math.max(0,hh)}" fill="${b.color}" rx="2"><title>${b.name} · ${o.cats[i]}: ${o.fmt(v)}</title></rect>`;
+      if(lab&&(o.stacked?hh>13:v>0))s+=`<text x="${x+(bw-2)/2}" y="${o.stacked?y0+hh/2+4:y0-4}" font-size="10" text-anchor="middle" fill="${o.stacked?'#fff':'#3A4350'}">${o.fmt(v)}</text>`;
+      acc+=v;});
+    s+=`<text x="${pl+gw*i+gw/2}" y="${H-pb+16}" font-size="11" text-anchor="middle" fill="#3A4350">${o.cats[i]}</text>`;}
+  if(o.line){const L=o.line,vs=L.vals.filter(v=>v!=null);let lo=Math.min(0,...vs),hi=Math.max(...vs);const pad=(hi-lo)*.15||1;lo-=pad;hi+=pad;
+    const yl=(v)=>pt+chh-((v-lo)/(hi-lo))*chh;let d='';L.vals.forEach((v,i)=>{d+=(i?'L':'M')+(pl+gw*i+gw/2)+','+yl(v);});
+    s+=`<path d="${d}" fill="none" stroke="${L.color}" stroke-width="2.5"/>`;
+    L.vals.forEach((v,i)=>{s+=`<circle cx="${pl+gw*i+gw/2}" cy="${yl(v)}" r="3.5" fill="${L.color}"><title>${L.name} · ${o.cats[i]}: ${L.fmt(v)}</title></circle>`;});
+    for(let g=0;g<=4;g++){const v=lo+(hi-lo)*g/4;s+=`<text x="${W-pr+6}" y="${yl(v)+4}" font-size="10.5" fill="${L.color}">${L.fmt(v)}</text>`;}}
+  s+='</svg>';
+  return `<div class="legend">${bars.map(b=>`<span><i style="background:${b.color}"></i>${b.name}</span>`).join('')}${o.line?`<span><i style="background:${o.line.color};height:3px;vertical-align:3px"></i>${o.line.name}</span>`:''}</div>`+s;
+}
+const fN=(v)=>Math.abs(v)>=1e6?nf(1).format(v/1e6)+'M':Math.abs(v)>=1e4?nf(1).format(v/1e3)+'k':nf(0).format(v);
+const fM=(v)=>nf(1).format(v/1e6);
+const fP=(v)=>nf(0).format(v*100)+'%';
+
+// ---------- ui helpers ----------
+const kpi=(k,x,s,dark)=>`<div class="kpi${dark?' dark':''}"><div class="k">${k}</div><div class="x">${x}</div><div class="s">${s||''}</div></div>`;
+const fbox=(k,x,s,out)=>`<div class="fbox${out?' out':''}"><div class="k">${k}</div><div class="x">${x}</div><div class="s">${s||''}</div></div>`;
+function tbl(head,rows){return '<table><thead><tr>'+head.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+
+  rows.map(r=>`<tr class="${r.tot?'tot':''} ${r.sel?'sel':''} ${r.click?'click':''}" ${r.click?`onclick="${r.click}"`:''}>`+r.cells.map(c=>`<td>${c}</td>`).join('')+'</tr>').join('')+'</tbody></table>';}
+const rule=(t)=>`<div class="rule"><b>Rule:</b> ${t}</div>`;
+const scope=()=>`${st.tool==='ALL'?'All tools':label(st.tool)} · ${st.region==='ALL'?'All regions':st.region}`;
+const isNew=(t)=>TN[t].is_new;
+function perTool(cols){
+  const rows=NAMES.map(t=>({click:`go('${t}')`,cells:[`<b>${label(t)}</b> <span class="muted">${TN[t].group}</span>`].concat(cols.map(c=>c.f([t])))}));
+  rows.push({tot:true,cells:['Total'].concat(cols.map(c=>c.f(NAMES)))});
+  return tbl(['Tool'].concat(cols.map(c=>c.h)),rows)+'<div class="note">Click a tool to see how its numbers were built.</div>';
+}
+function notes(t, step){
+  const T=TN[t], out=[];
+  if(step==='split'){ if(T.allocation_from) out.push(`<b>${label(t)}:</b> regional split borrowed from <b>${label(T.allocation_from)}</b>.`);
+    if(T.excluded.length) out.push(`<b>Excluded regions:</b> ${T.excluded.join(', ')} (agreed not to compete with another tool there); the other regions are renormalised.`);}
+  if(step==='ticket'){ if(T.reference) out.push(`<b>New tool:</b> base ticket and adjustment factor borrowed from <b>${label(T.reference)}</b>.`);
+    else if(T.ticket_target) out.push(`<b>Ticket target:</b> ${N(T.ticket_target)} on average (unadjusted ${N(T.ticket_unadjusted)}): factor ${nf(4).format(T.ticket_factor)}.`);}
+  if(step==='eff'){ if(T.fixed_efficiency) out.push(`<b>Fixed efficiency:</b> ${P(T.fixed_efficiency.eff_qty)} qty / ${P(T.fixed_efficiency.eff_value)} value.`);
+    else if(T.reference) out.push(`<b>Borrowed efficiency:</b> ${label(T.reference)} consolidated plan × (1 − ${P(T.reducer,0)}).`);
+    Object.entries(T.overrides||{}).forEach(([r,v])=>out.push(`<b>Override in ${r}:</b> ${Object.entries(v).map(([k,x])=>label(k)+' = '+P(x)).join(', ')} (contracted).`));}
+  if(step==='prod' && T.is_new) out.push(`<b>New tool:</b> productivity of <b>${label(T.reference)}</b> + gain; no consolidated floor (no history of its own).`);
+  return out.map(x=>`<div class="note">${x}</div>`).join('');
+}
+
+// ---------- steps ----------
+const STEPS=[
+ {t:'Overview',d:'all tools',v:()=>M(year(plan(NAMES,D.regions)).value_paid)+' paid'},
+ {t:'Volume',d:'executed qty',v:()=>N(year(plan()).qty_executed)},
+ {t:'Regional split',d:'contribution degree',v:()=>st.tool!=='ALL'&&st.region!=='ALL'?P(TN[st.tool].shares[st.region].share):N(year(plan()).qty_executed)},
+ {t:'Seasonality',d:'month by month',v:()=>{const q=plan().qty_executed;return N(Math.max(...q))+' peak';}},
+ {t:'Ticket',d:'quarterly mean × market',v:()=>N(year(plan()).ticket)},
+ {t:'Productivity',d:'selected volume',v:()=>P(year(plan()).prod_value)},
+ {t:'Efficiency',d:'paid volume',v:()=>P(year(plan()).eff_value)},
+ {t:'Result',d:'11 indicators',v:()=>M(year(plan()).value_paid)},
+ {t:'Workforce',d:'field agents',v:()=>D.workforce?N(avgAgents())+' agents':'—'},
+];
+function avgAgents(){const g=D.workforce.by_group;const by={};g.forEach(r=>{by[r.month]=(by[r.month]||0)+r.agents;});const v=Object.values(by);return v.reduce((a,b)=>a+b,0)/v.length;}
+
+function sOverview(){
+  const p=year(plan(NAMES,D.regions)), f=year(fcq(NAMES,D.regions));
+  let h=`<h2>Overview</h2><p class="lead">Pick a tool (buttons or table) and walk the steps from left to right. Plan year ${D.plan_year}; history year ${D.history_year} (actuals until month ${D.last_actual_month}).</p>`;
+  h+=`<div class="kpis">${kpi('Paid value '+D.plan_year,M(p.value_paid),'forecast '+M(f.value_paid),true)}${kpi('vs forecast',DV(p.value_paid,f.value_paid),'')}${kpi('Executed actions',N(p.qty_executed),'forecast '+N(f.qty_executed))}${kpi('Executed value',M(p.value_executed),'forecast '+M(f.value_executed))}${kpi('Value efficiency',P(p.eff_value),'forecast '+P(f.eff_value))}</div>`;
+  h+=rule('volume → regional split → seasonality → ticket (quarterly mean × market growth) → selected (÷ productivity) → paid (× efficiency) → coherence rules → result → workforce.');
+  h+=`<div class="grid"><div class="card c6"><h3>Paid value per tool (M)</h3>${chart({cats:NAMES.map(short),bars:[{name:'Forecast '+D.history_year,color:C.navy,vals:NAMES.map(t=>isNew(t)?null:year(fcq([t],D.regions)).value_paid)},{name:'Plan '+D.plan_year,color:C.orange,vals:NAMES.map(t=>year(plan([t],D.regions)).value_paid)}],fmt:fM,w:620,h:270})}</div>`;
+  const rows=NAMES.map(t=>{const a=year(plan([t],D.regions)),b=year(fcq([t],D.regions));return {click:`go('${t}',1)`,cells:[`<b>${label(t)}</b>`,isNew(t)?'new':N(b.qty_executed),N(a.qty_executed),N(a.ticket),P(a.eff_value),isNew(t)?'—':M(b.value_paid),M(a.value_paid),isNew(t)?'new':`<span class="${cls(a.value_paid-b.value_paid)}">${DV(a.value_paid,b.value_paid)}</span>`]};});
+  rows.push({tot:true,cells:['Total',N(f.qty_executed),N(p.qty_executed),N(p.ticket),P(p.eff_value),M(f.value_paid),M(p.value_paid),DV(p.value_paid,f.value_paid)]});
+  return h+`<div class="c6">${tbl(['Tool','Qty FC','Qty plan','Ticket','Eff. value','Paid FC','Paid plan','Δ'],rows)}</div></div>`;
+}
+function sVolume(){
+  const q=fcq(),tq=tgq(),pl=plan(),pq=[0,1,2,3].map(i=>pl.qty_executed.slice(i*3,i*3+3).reduce((a,b)=>a+b,0));
+  let h=`<h2>1. Volume — ${scope()}</h2><p class="lead">How many actions are executed. The official annual volume per tool is the starting point.</p>`;
+  h+=rule('the plan volume of each tool is the corporate volume (assumptions.yaml); regions get their part in step 2.');
+  if(st.tool!=='ALL') h+=`<div class="flow">${fbox('Target '+D.history_year,isNew(st.tool)?'—':N(tot(tq).qty_executed))}${fbox('Forecast '+D.history_year,isNew(st.tool)?'—':N(tot(q).qty_executed))}${fbox('Plan '+D.plan_year,N(tot(pl).qty_executed),isNew(st.tool)?'new tool':DV(tot(pl).qty_executed,tot(q).qty_executed)+' vs forecast',true)}</div>`;
+  h+=`<div class="grid"><div class="card ${st.tool==='ALL'?'c5':'c12'}"><h3>Executed actions per quarter</h3>${chart({cats:QS,bars:[{name:'Target',color:C.gray,vals:tq.qty_executed},{name:'Forecast',color:C.navy,vals:q.qty_executed},{name:'Plan',color:C.orange,vals:pq}],fmt:fN,w:st.tool==='ALL'?520:1200,h:250})}</div>`;
+  if(st.tool==='ALL') h+=`<div class="c7">${perTool([{h:'Target',f:(t)=>N(tot(tgq(t)).qty_executed)},{h:'Forecast',f:(t)=>N(tot(fcq(t)).qty_executed)},{h:'Plan',f:(t)=>N(tot(plan(t)).qty_executed)},{h:'Δ vs FC',f:(t)=>{const a=tot(plan(t)).qty_executed,b=tot(fcq(t)).qty_executed;return b?`<span class="${cls(a-b)}">${DV(a,b)}</span>`:'new';}}])}</div>`;
+  return h+'</div>';
+}
+function sSplit(){
+  let h=`<h2>2. Regional split — ${st.tool==='ALL'?'All tools':label(st.tool)}</h2><p class="lead">How the annual volume is shared between regions.</p>`;
+  h+=rule(`base share = region's share of the ${D.history_year} target. Regions below target get weight = share × (1 + ${P(D.gap_weight,0)} × gap), gap = 1 − forecast ÷ target. Regions at or above target get no extra pressure. Weights are normalised to 100%. No target last year → no target now.`);
+  if(st.tool==='ALL'){
+    const rows=D.regions.map(r=>({sel:r===st.region,click:`setRegion('${r}')`,cells:[r].concat(NAMES.map(t=>{const v=tot(plan([t],[r])).qty_executed;return v?N(v):'—';})).concat([`<b>${N(tot(plan(NAMES,[r])).qty_executed)}</b>`])}));
+    rows.push({tot:true,cells:['Total'].concat(NAMES.map(t=>N(tot(plan([t],D.regions)).qty_executed))).concat([N(tot(plan(NAMES,D.regions)).qty_executed)])});
+    return h+tbl(['Region'].concat(NAMES.map(short)).concat(['Total']),rows);
+  }
+  const T=TN[st.tool], S=T.shares, sel=st.region!=='ALL'?S[st.region]:null;
+  if(sel) h+=`<div class="flow">${fbox('Target / forecast',N(sel.target)+' / '+N(sel.forecast),'adherence '+P(sel.adherence,0))}${fbox('Gap',P(sel.gap),sel.gap>0?'extra weight':'no extra weight')}${fbox('Base → final share',P(sel.base_share)+' → '+P(sel.share))}${fbox(st.region+' plan',N(sel.share*T.volume),'= '+N(T.volume)+' × '+P(sel.share),true)}</div>`;
+  const rows=D.regions.map(r=>{const s=S[r];return {sel:r===st.region,click:`setRegion('${r}')`,cells:[r,N(s.target),N(s.forecast),s.target?P(s.adherence,0):'no target',s.gap?`<span class="neg">${P(s.gap)}</span>`:'0.0%',P(s.base_share),P(s.share),N(s.share*T.volume)]};});
+  h+=`<div class="grid"><div class="c7">${tbl(['Region','Target','Forecast','Adherence','Gap','Base share','Final share','Plan qty'],rows)}</div>`;
+  h+=`<div class="card c5"><h3>Base share vs final share</h3>${chart({cats:D.regions,bars:[{name:'Base share',color:C.gray,vals:D.regions.map(r=>S[r].base_share)},{name:'Final share',color:C.orange,vals:D.regions.map(r=>S[r].share)}],fmt:fP,w:520,h:240})}</div></div>`;
+  return h+notes(st.tool,'split');
+}
+function sSeason(){
+  const p=plan(), q=p.qty_executed, yr=q.reduce((a,b)=>a+b,0);
+  let h=`<h2>3. Seasonality — ${scope()}</h2><p class="lead">How the annual volume is spread over the months.</p>`;
+  h+=rule('monthly qty = annual qty × normalised curve of the tool group (curves are normalised so the year adds up exactly).');
+  if(st.tool!=='ALL') return h+`<div class="card">${chart({cats:MONTHS,bars:[{name:'Executed actions',color:C.navy,vals:q}],line:{name:'Share of the year',color:C.orange,vals:q.map(v=>yr?v/yr:0),fmt:(v)=>nf(1).format(v*100)+'%'},fmt:fN,w:1200,h:270})}</div>`;
+  const grp=(g)=>plan(NAMES.filter(t=>TN[t].group===g)), groups=[...new Set(NAMES.map(t=>TN[t].group))], col=[C.navy,C.orange,C.teal];
+  return h+`<div class="grid"><div class="card c6"><h3>Executed actions per month</h3>${chart({cats:MONTHS,bars:groups.map((g,i)=>({name:g,color:col[i%3],vals:grp(g).qty_executed})),stacked:true,fmt:fN,w:620,h:260})}</div><div class="card c6"><h3>Paid value per month (M)</h3>${chart({cats:MONTHS,bars:groups.map((g,i)=>({name:g,color:col[i%3],vals:grp(g).value_paid})),stacked:true,fmt:fM,w:620,h:260})}</div></div>`;
+}
+function sTicket(){
+  const p=plan(), y=year(p), tk=MONTHS.map((_,i)=>at(p,i).ticket);
+  let h=`<h2>4. Ticket — ${scope()}</h2><p class="lead">Average debt per executed action.</p>`;
+  h+=rule(`base = mean of the ${D.history_year} quarterly tickets (quarters with fewer than ${N(D.min_quarter_qty)} executions are ignored), flat over the year. Monthly ticket = base × (1 + market growth) × adjustment factor (target ÷ unadjusted average; 1 without target).`);
+  if(st.tool!=='ALL'){const T=TN[st.tool], fq=fcq([isNew(st.tool)?T.reference:st.tool]), b=st.region==='ALL'?null:T.base_ticket[st.region];
+    h+=`<div class="flow">${fbox('Quarterly tickets (forecast)',QS.map((_,i)=>{const r=at(fq,i);return fq.qty_executed[i]>=D.min_quarter_qty?N(r.ticket):'—';}).join(' · '),isNew(st.tool)?'from '+label(T.reference):'')}${fbox('Base ticket',b?N(b):'by region','mean of valid quarters')}${fbox('× market growth',P(Math.min(...D.market_growth))+' to '+P(Math.max(...D.market_growth)))}${fbox('× factor',nf(4).format(T.ticket_factor),T.ticket_target?'target '+N(T.ticket_target):'no target')}${fbox('Plan ticket',N(y.ticket),'year average',true)}</div>`;}
+  h+=`<div class="grid"><div class="card ${st.tool==='ALL'?'c5':'c8'}"><h3>Monthly ticket vs market growth</h3>${chart({cats:MONTHS,bars:[{name:'Ticket',color:C.navy,vals:tk}],line:{name:'Market growth',color:C.orange,vals:D.market_growth,fmt:(v)=>nf(0).format(v*100)+'%'},fmt:(v)=>nf(0).format(v),w:st.tool==='ALL'?520:800,h:260})}</div>`;
+  if(st.tool==='ALL') return h+`<div class="c7">${perTool([{h:'Ticket FC',f:(t)=>t.length===1&&isNew(t[0])?'—':N(year(fcq(t)).ticket)},{h:'Ticket plan',f:(t)=>N(year(plan(t)).ticket)},{h:'Exec. value FC',f:(t)=>t.length===1&&isNew(t[0])?'—':M(year(fcq(t)).value_executed)},{h:'Exec. value plan',f:(t)=>M(year(plan(t)).value_executed)}])}</div></div>`;
+  return h+`<div class="card c4"><h3>Executed value</h3>${tbl(['Item','Value'],[{cells:['Executed actions',N(y.qty_executed)]},{cells:['× average ticket',N(y.ticket)]},{tot:true,cells:['= Executed value',M(y.value_executed)]}])}</div></div>`+notes(st.tool,'ticket');
+}
+function sProd(){
+  const y=year(plan());
+  let h=`<h2>5. Productivity — ${scope()}</h2><p class="lead">Productivity = executed ÷ selected. It defines how much must be selected.</p>`;
+  h+=rule('forecast + gain (0.5 to 2 pp), capped. <b>Floor:</b> the tool\'s consolidated productivity cannot fall below the forecast; regions that received extra volume get one common extra gain. <b>Largest debts first:</b> value productivity ≥ qty productivity, so the selected ticket never exceeds the executed ticket.');
+  if(st.tool==='ALL') return h+perTool([{h:'Prod. qty FC',f:(t)=>t.length===1&&isNew(t[0])?'—':P(year(fcq(t)).prod_qty)},{h:'Prod. qty plan',f:(t)=>P(year(plan(t)).prod_qty)},{h:'Prod. value FC',f:(t)=>t.length===1&&isNew(t[0])?'—':P(year(fcq(t)).prod_value)},{h:'Prod. value plan',f:(t)=>P(year(plan(t)).prod_value)},{h:'Selected qty',f:(t)=>N(year(plan(t)).qty_selected)}]);
+  const T=TN[st.tool], pr=T.prod, r=st.region==='ALL'?null:pr[st.region];
+  h+=`<div class="flow">${r?fbox('Forecast (qty / value)',P(r.fc_prod_qty)+' / '+P(r.fc_prod_value))+fbox('+ gain',P(r.gain_prod_qty)+' / '+P(r.gain_prod_value)):''}${fbox('Plan (qty / value)',P(y.prod_qty)+' / '+P(y.prod_value),'after the rules',true)}${fbox('Selected',N(y.qty_selected)+' actions',M(y.value_selected))}${fbox('Selected vs executed ticket',N(y.value_selected/y.qty_selected)+' vs '+N(y.ticket),y.value_selected/y.qty_selected<=y.ticket+0.01?'rule met ✓':'check')}</div>`;
+  const has=(rg)=>T.shares[rg].share>0;
+  h+=`<div class="grid"><div class="card c7"><h3>Productivity per region: forecast vs plan</h3>${chart({cats:D.regions,bars:[{name:'FC qty',color:C.light,vals:D.regions.map(g=>has(g)?pr[g].fc_prod_qty:null)},{name:'Plan qty',color:C.navy,vals:D.regions.map(g=>has(g)?pr[g].prod_qty:null)},{name:'FC value',color:C.peach,vals:D.regions.map(g=>has(g)?pr[g].fc_prod_value:null)},{name:'Plan value',color:C.orange,vals:D.regions.map(g=>has(g)?pr[g].prod_value:null)}],fmt:fP,w:700,h:250})}</div>`;
+  h+=`<div class="card c5"><h3>Rule factors</h3>${tbl(['Rule','Factor'],[{cells:['Floor (qty)',nf(4).format(T.floor_factor[0])]},{cells:['Floor (value)',nf(4).format(T.floor_factor[1])]},{cells:['Consolidated selected ticket',nf(4).format(T.consolidated_factor)]}])}<div class="note">1.0000 = rule already met, nothing changed. A floor factor below 1 lifts the productivity of the regions that received extra volume.</div></div></div>`;
+  return h+notes(st.tool,'prod');
+}
+function sEff(){
+  const y=year(plan());
+  let h=`<h2>6. Efficiency — ${scope()}</h2><p class="lead">Efficiency = paid ÷ executed. It turns execution into cash.</p>`;
+  h+=rule('forecast + gain, capped. Overrides fix a region (contracted value). New tools borrow the reference tool\'s consolidated efficiency × (1 − reducer) or use a fixed value.');
+  if(st.tool==='ALL') return h+perTool([{h:'Eff. qty FC',f:(t)=>t.length===1&&isNew(t[0])?'—':P(year(fcq(t)).eff_qty)},{h:'Eff. qty plan',f:(t)=>P(year(plan(t)).eff_qty)},{h:'Eff. value FC',f:(t)=>t.length===1&&isNew(t[0])?'—':P(year(fcq(t)).eff_value)},{h:'Eff. value plan',f:(t)=>P(year(plan(t)).eff_value)},{h:'Paid value',f:(t)=>M(year(plan(t)).value_paid)}]);
+  const f=year(fcq());
+  h+=`<div class="flow">${fbox('Forecast (qty / value)',isNew(st.tool)?'—':P(f.eff_qty)+' / '+P(f.eff_value))}${fbox('Plan (qty / value)',P(y.eff_qty)+' / '+P(y.eff_value))}${fbox('Executed value',M(y.value_executed))}${fbox('Paid value',M(y.value_paid),N(y.qty_paid)+' paying customers',true)}</div>`;
+  const T=TN[st.tool];
+  h+=`<div class="card">${chart({cats:D.regions,bars:[{name:'Forecast value eff.',color:C.navy,vals:D.regions.map(r=>{const q=fcq([st.tool],[r]);return isNew(st.tool)||!tot(q).qty_executed?null:year(q).eff_value;})},{name:'Plan value eff.',color:C.orange,vals:D.regions.map(r=>T.shares[r].share>0?T.eff[r].eff_value:null)}],fmt:fP,w:1200,h:240})}</div>`;
+  return h+notes(st.tool,'eff');
+}
+function sResult(){
+  const L=[['Executed qty','qty_executed',N],['Ticket','ticket',N],['Executed value','value_executed',M],['Productivity qty','prod_qty',P],['Selected qty','qty_selected',N],['Productivity value','prod_value',P],['Selected value','value_selected',M],['Efficiency qty','eff_qty',P],['Paid qty','qty_paid',N],['Efficiency value','eff_value',P],['Paid value','value_paid',M]];
+  const pct=new Set(['prod_qty','prod_value','eff_qty','eff_value']), t=year(tgq()), f=year(fcq()), p=year(plan());
+  const rows=L.map(([l,k,fn])=>({tot:k==='value_paid',cells:[l,t[k]?fn(t[k]):'—',f[k]?fn(f[k]):'—',fn(p[k]),pct.has(k)?(f[k]?`<span class="${cls(p[k]-f[k])}">${PP(p[k]-f[k])}</span>`:'—'):(f[k]?`<span class="${cls(p[k]-f[k])}">${DV(p[k],f[k])}</span>`:'—')]}));
+  const pl=plan(), pq=[0,1,2,3].map(i=>pl.value_paid.slice(i*3,i*3+3).reduce((a,b)=>a+b,0));
+  return `<h2>7. Result — ${scope()}</h2><p class="lead">The 11 indicators of the plan against the target and the forecast of ${D.history_year}.</p><div class="grid"><div class="c5">${tbl(['Indicator','Target','Forecast','Plan','Δ vs FC'],rows)}</div><div class="card c7"><h3>Paid value per quarter (M)</h3>${chart({cats:QS,bars:[{name:'Target',color:C.gray,vals:tgq().value_paid},{name:'Forecast',color:C.navy,vals:fcq().value_paid},{name:'Plan',color:C.orange,vals:pq}],fmt:fM,w:680,h:210})}<h3 style="margin-top:8px">Paid value per month (k)</h3>${chart({cats:MONTHS,bars:[{name:'Paid value',color:C.orange,vals:pl.value_paid}],fmt:(v)=>nf(0).format(v/1e3),w:680,h:170})}</div></div>`;
+}
+function sWorkforce(){
+  const W=D.workforce; if(!W) return '<h2>Workforce</h2><p>No workforce section in the assumptions.</p>';
+  const groups=W.groups.map(g=>g.name), col=[C.navy,C.orange,C.teal];
+  const val=(g,m,k)=>(W.by_group.find(r=>r.group===g&&r.month===m)||{})[k]||0;
+  let h=`<h2>8. Workforce</h2><p class="lead">Field agents needed per month.</p>`;
+  h+=rule('agents = volume of the month ÷ (business days of the tool\'s calendar × actions per agent per day), rounded up. Regions are rounded up separately because agents do not move between regions.');
+  h+=`<div class="kpis">${W.groups.map(g=>{const a=MONTHS.map((_,i)=>val(g.name,i+1,'agents'));return kpi(g.name+' · '+N(g.actions_per_day)+'/day',nf(1).format(a.reduce((x,y)=>x+y,0)/12)+' agents','peak '+Math.max(...a)+' · '+Object.keys(g.tools).map(label).concat(g.extra.map(label)).join(', '));}).join('')}${kpi('Total',N(avgAgents(),1)+' agents','consolidated, monthly average',true)}</div>`;
+  h+=`<div class="grid"><div class="card c7"><h3>Agents per month</h3>${chart({cats:MONTHS,bars:groups.map((g,i)=>({name:g,color:col[i%3],vals:MONTHS.map((_,m)=>val(g,m+1,'agents'))})),stacked:true,fmt:(v)=>nf(0).format(v),w:700,h:260})}</div>`;
+  const rows=D.regions.map(r=>({sel:r===st.region,cells:[r].concat(groups.map(g=>{const a=W.by_region.filter(x=>x.group===g&&x.region===r).map(x=>x.agents);return a.length&&Math.max(...a)?nf(1).format(a.reduce((x,y)=>x+y,0)/12)+' · '+Math.max(...a):'—';}))}));
+  h+=`<div class="c5">${tbl(['Region'].concat(groups.map(g=>g+' (avg · peak)')),rows)}</div></div>`;
+  if(Object.keys(W.calendars).length) h+=`<div class="card" style="margin-top:14px"><h3>Business days per calendar</h3>${tbl(['Calendar'].concat(MONTHS),Object.entries(W.calendars).map(([k,v])=>({cells:[k].concat(v.map(x=>nf(x%1?1:0).format(x)))})))}</div>`;
+  return h;
+}
+const RENDER=[sOverview,sVolume,sSplit,sSeason,sTicket,sProd,sEff,sResult,sWorkforce];
+
+// ---------- controls ----------
+function go(t,step){st.tool=t;if(step!=null)st.step=step;render();window.scrollTo({top:0,behavior:'smooth'});}
+function setRegion(r){st.region=r;document.getElementById('region').value=r;render();}
+function render(){
+  document.getElementById('tools').innerHTML=`<button class="chip${st.tool==='ALL'?' on':''}" onclick="go('ALL')">All tools</button>`+NAMES.map(t=>`<button class="chip${t===st.tool?' on':''}" onclick="go('${t}')">${label(t)}</button>`).join('');
+  document.getElementById('stepper').innerHTML=STEPS.map((s,i)=>`<div class="step${i===st.step?' on':''}" onclick="st.step=${i};render()"><div><span class="n">${i}</span><span class="t">${s.t}</span></div><div class="v">${s.v()}</div><div class="d">${s.d}</div></div>`).join('');
+  document.getElementById('panel').innerHTML=RENDER[st.step]();
+}
+document.getElementById('region').innerHTML=['ALL'].concat(D.regions).map(r=>`<option value="${r}">${r==='ALL'?'All regions':r}</option>`).join('');
+document.getElementById('region').onchange=(e)=>{st.region=e.target.value;render();};
+document.getElementById('sub').textContent=`Plan ${D.plan_year} · generated ${D.generated} · synthetic data`;
+render();
+</script>
+</body>
+</html>
