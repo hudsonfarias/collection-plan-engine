@@ -1,13 +1,16 @@
 # Collection Plan Engine
 
-![tests](https://img.shields.io/badge/tests-pytest-blue) ![python](https://img.shields.io/badge/python-3.10%2B-blue) ![license](https://img.shields.io/badge/license-MIT-green)
+[![CI](https://github.com/hudsonfarias/collection-plan-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/hudsonfarias/collection-plan-engine/actions/workflows/ci.yml) ![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue) ![code style](https://img.shields.io/badge/code%20style-ruff-black) ![license](https://img.shields.io/badge/license-MIT-green)
 
 A Python engine that builds an **annual debt-collection plan** for a utility: how many collection
 actions each tool must execute, in each region and month, how much must be selected, how much cash
 comes back, and how many field agents are needed to deliver it.
 
 Every target is traceable: it comes from the history year plus a small set of explicit assumptions
-kept in one YAML file. Every business rule has a unit test.
+kept in one YAML file. Every business rule has a unit test. The result comes out as CSV, a formatted
+Excel workbook and an interactive HTML report that walks through each step.
+
+![Interactive report: overview](docs/img/report_overview.jpg)
 
 > All data in this repository is **synthetic** (a fictional utility, "Acme Power", with five regions).
 > No real company data is included.
@@ -69,8 +72,8 @@ python -m venv .venv && .venv\Scripts\activate      # Windows  (Linux/macOS: sou
 pip install -e ".[dev]"
 
 collection-plan generate-data      # writes data/raw/history.csv (synthetic, seed 42)
-collection-plan run                # writes the plan to outputs/
-pytest                             # 26 tests
+collection-plan run                # writes the plan and the reports to outputs/
+pytest                             # 29 tests
 ```
 
 Without installing: `set PYTHONPATH=src` and use `python -m collection_plan ...`.
@@ -98,6 +101,22 @@ Files written to `outputs/`:
 | `plan_summary.csv` | annual totals per tool, forecast vs plan |
 | `workforce_by_group.csv` | agents per team and month (exact and rounded up) |
 | `workforce_by_region.csv` | agents per team, region and month |
+| `plan_report.xlsx` | formatted workbook, one sheet per step (assumptions, regional split, ticket, productivity, efficiency, monthly plan, workforce) |
+| `plan_report.html` | single-file interactive report, works offline: pick a tool and a region and walk through the steps |
+
+Use `collection-plan run --no-reports` to write the CSV files only.
+
+### Interactive report
+
+Each step shows the rule, the numbers going in and out, and a chart. Filter by tool and region.
+
+| Regional split | Workforce |
+|---|---|
+| ![Regional split](docs/img/report_regional_split.jpg) | ![Workforce](docs/img/report_workforce.jpg) |
+
+The page is a plain HTML file with the data embedded as JSON and charts drawn as SVG: no server, no
+external libraries, so it can be attached to an e-mail. Every CI run publishes the example reports as a
+build artifact.
 
 ## Using it as a library
 
@@ -118,9 +137,11 @@ result.tools["field_visit"].productivity.table # productivity before/after each 
 
 ```
 config/assumptions.yaml    every assumption the engine uses (gains, curves, targets, calendars)
-src/collection_plan/       the engine, one module per step
-tests/                     unit tests per rule + integration tests on the full plan
-docs/                      methodology and design decisions
+src/collection_plan/       the engine, one module per step, plus report_excel.py and report_html.py
+src/collection_plan/templates/report.html   HTML report template (data injected as JSON)
+tests/                     unit tests per rule + integration tests on the full plan + report tests
+docs/                      methodology, design decisions and screenshots
+.github/workflows/ci.yml   lint, tests and example build on every push
 data/                      synthetic history (generated, not versioned)
 ```
 
@@ -134,14 +155,19 @@ The tests encode the business rules, so a change that breaks a rule fails the bu
 * consolidated productivity never falls below the forecast;
 * the selected ticket never exceeds the executed ticket (largest debts first), per region and per tool;
 * business-day calendars, including "no holiday and no holiday eve" rules;
-* agents are always rounded up, and the regional sum is never below the consolidated need.
+* agents are always rounded up, and the regional sum is never below the consolidated need;
+* the Excel and HTML reports carry the same totals as the plan, and the HTML works offline.
+
+GitHub Actions runs lint (ruff), the tests and an end-to-end build of the example plan on Python
+3.10, 3.11 and 3.12 for every push.
 
 ## Roadmap
 
 - [x] Engine, synthetic data, CLI and tests
-- [ ] Excel report (one sheet per step, formatted)
-- [ ] Interactive HTML report walking through each step
-- [ ] GitHub Actions (lint + tests on every push)
+- [x] Excel report (one sheet per step, formatted)
+- [x] Interactive HTML report walking through each step
+- [x] GitHub Actions (lint + tests + example build on every push)
+- [ ] Scenario comparison (e.g. plan with and without market growth)
 
 ---
 
@@ -162,7 +188,9 @@ volta em pagamento e quantos agentes de campo são necessários.
   quinta, sem feriado e véspera).
 
 Todas as premissas ficam em `config/assumptions.yaml`, cada regra tem teste automatizado e os dados são
-100% sintéticos.
+100% sintéticos. O resultado sai em CSV, numa planilha Excel formatada (uma aba por etapa) e num
+relatório HTML interativo que funciona offline. A cada envio ao GitHub, o GitHub Actions roda o lint,
+os testes e gera o plano de exemplo.
 
 ## License
 

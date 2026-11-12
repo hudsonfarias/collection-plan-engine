@@ -36,7 +36,14 @@ optionally, `allocation_from` (regional split) and a reducer or fixed efficiency
 **Why.** Every number keeps a traceable origin, and the assumption is explicit and easy to revise after
 the first quarter of real data.
 
-## 6. Synthetic data with a fixed seed
+## 6. HTML report without dependencies
+
+**Decision.** The interactive report is one HTML file: the template ships with the package, the data is
+embedded as JSON and the charts are drawn as inline SVG by a small script.
+**Why.** Business users open it from an e-mail or a shared folder, often offline and behind a corporate
+proxy. No server, no CDN and no build step means it always opens.
+
+## 7. Synthetic data with a fixed seed
 
 **Decision.** `generate_history(seed=42)` builds the example base; the real base is never versioned.
 **Why.** The repository must be public and reproducible without exposing any real data.
